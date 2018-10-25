@@ -5,7 +5,12 @@
     <title>List</title>
   </head>
   <body>
-    <% for (var i = 0; i < 3; i++) { %>
+    <% if (typeof flagDelete !== "undefined") { %>
+      <script type="text/javascript">
+        alert("삭제 완료")
+      </script>
+    <% } %>
+    <% for (var i in Array(10)) { %>
       abc
     <% } %>
   </body>
