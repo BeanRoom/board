@@ -7,47 +7,70 @@ var dbData = require('../public/test/db.json');
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.redirect("/board/lists");
-});
+router.get('/:board', function(req, res, next) {
+  var board = req.params.board;
+  if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
+    board = "freeboard";
+  }
+  //switch (board) {
+  //  case "freeboard":
 
-router.get('/view', function(req, res, next) {
-  res.redirect("/board/lists");
-});
-router.get('/view/:id', function(req, res, next) {
-  // DB 불러오기
-  console.log(req.params.id);
-  if (typeof req.params.id === "undefined") {
-    res.redirect("/board/lists");
-  }
-  postWriter = dbData['writer']
-  if (dbData['visible'] == 0) {
-    postWriter = "익명";
-  }
-  console.log("Board System Working");
-  res.render('board/view', { title: dbData['title'], content: dbData['content'], time: dbData['time'], hits: dbData['hits'], writer: postWriter, boardNum: req.params.id });
-});
-router.get('/lists', function(req, res, next) {
-  var board = req.query.flag;
-  console.log("Board System Working");
+  //    break;
+  //  case "notice":
+  //    break;
+  //  case "storage"
+  //  default:
+
+  //}
   res.render('board/lists', { title: dbData['title'], content: dbData['content'], time: dbData['time'], hits: dbData['hits'], writer: dbData['writer'] });
 });
+
+router.get('/:board/:id', function(req, res, next) {
+  var board = req.params.board;
+  var id = req.params.id;
+  if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
+    res.redirect("/board/freeboard");
+  }
+  if (typeof req.params.id === "undefined") {
+    res.redirect("/board/" + req.params.board);
+  }
+  if (id === "write") {
+    res.render('board/write', { board: board });
+  } else {
+    postWriter = dbData['writer']
+    if (dbData['visible'] == 0) {
+      postWriter = "익명";
+    }
+    console.log("Board System Working");
+    res.render('board/view', { title: dbData['title'], content: dbData['content'], time: dbData['time'], hits: dbData['hits'], writer: postWriter, boardNum: req.params.id });
+  }
+});
+
+router.get('/:board/:id/:mode', function(req,res,next) {
+  if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
+    res.redirect("/board/freeboard");
+  }
+  if (typeof req.params.id === "undefined") {
+    res.redirect("/board/freeboard");
+  }
+  if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
+    res.redirect("/board/freeboard");
+  }
+  switch (req.params.mode) {
+    case "edit":
+      res.render('board/write', {});
+      break;
+    case "delete":
+      res.render('board/delete', { title: dbData['title'], nid: req.params.id });
+    default:
+      break;
+  }
+});
+
+
 router.get('/write', function(req, res, next) {
   console.log("Board System Working");
-  res.render('board/write', {});
-});
-router.get('/modify', function(req, res, next) {
-  console.log("Board System Working");
-  res.render('board/modify', { title: dbData['title'], content: dbData['content'] });
-});
-router.get('/delete', function(req, res, next) {
-  res.redirect("/board/lists");
-});
-router.get('/delete/:id', function(req, res, next) {
-  if (typeof req.params.id === "undefined") {
-    res.redirect("/board/lists");
-  }
-  res.render('board/delete', { title: dbData['title'], nid: req.params.id });
+
 });
 
 router.post('/deleteDo', function(req, res, next) {
