@@ -10,7 +10,11 @@
         alert("삭제 완료")
       </script>
     <% } %>
-    <% for (var i in Array(10)) { %>
+    <ul>
+      <li><%= list['title'] list['content'] list['hits'] list['writer']</li>
+    </ul>
+    <%=
+    <% for (var i in dbdata) { %>
       abc
     <% } %>
   </body>

@@ -14,7 +14,7 @@ router.get('/:board', function(req, res, next) {
     board = "freeboard";
   }
   // DB 내용 가져오기
-  res.render('board/lists', { list: dbData });
+  res.render('board/lists', { board: board, list: dbData });
 });
 
 router.get('/:board/:id', function(req, res, next) {
