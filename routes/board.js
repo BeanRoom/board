@@ -1,5 +1,6 @@
 var express = require('express');
 var request = require('request');
+var mongoose = require('mongoose');
 var router = express.Router();
 
 // DB 대체
@@ -12,17 +13,8 @@ router.get('/:board', function(req, res, next) {
   if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
     board = "freeboard";
   }
-  //switch (board) {
-  //  case "freeboard":
-
-  //    break;
-  //  case "notice":
-  //    break;
-  //  case "storage"
-  //  default:
-
-  //}
-  res.render('board/lists', { title: dbData['title'], content: dbData['content'], time: dbData['time'], hits: dbData['hits'], writer: dbData['writer'] });
+  // DB 내용 가져오기
+  res.render('board/lists', { list: dbData });
 });
 
 router.get('/:board/:id', function(req, res, next) {
@@ -47,6 +39,7 @@ router.get('/:board/:id', function(req, res, next) {
 });
 
 router.get('/:board/:id/:mode', function(req,res,next) {
+  var board = req.params.board;
   if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
     res.redirect("/board/freeboard");
   }
@@ -58,7 +51,7 @@ router.get('/:board/:id/:mode', function(req,res,next) {
   }
   switch (req.params.mode) {
     case "edit":
-      res.render('board/write', {});
+      res.render('board/edit', { board: board, title: dbData['title'], content: dbData['content'] });
       break;
     case "delete":
       res.render('board/delete', { title: dbData['title'], nid: req.params.id });
