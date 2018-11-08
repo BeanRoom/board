@@ -37,7 +37,7 @@ router.get('/:board', function(req, res, next) {
     res.render('board/error');
     return;
   }
-  var dbData = db.board.find({board: board});
+  var dbData = db.collection('board').find({board: board});
   for (var i = 0; i < dbdata.length; i++) {
     if (dbdata[i]['visible'] === 0) {
       dbdata[i]['writer_id'] = "익명";
@@ -62,7 +62,7 @@ router.get('/:board/:id', function(req, res, next) {
   } else {
     var dbData;
     try {
-      dbData = db.board.findOne({visible: 1, board: board, board_num: id});
+      dbData = db.collection('board').findOne({visible: 1, board: board, board_num: id});
     } catch (e) {
       res.redirect('/board/error');
       return;
@@ -126,9 +126,11 @@ router.post('/writeDo/:id', function(req, res, next) {
   }
   var dbData;
   try {
-    dbData = db.meta.findOne({info: 'board'});
-    db.meta.update({info:'board'}, {$set: { dbData['count'] + 1 }});
-    db.board.insertOne({board: req.body.board, board_num: dbData['count'] + 1});
+    db.collection('meta').findOne({info: 'board'}).toArray(function(err, result) {
+      dbData = result['count'] + 1;
+    });
+    db.meta.update({info:'board'}, {$set: { count: dbData }});
+    db.board.insertOne({board: req.body.board, board_num: dbData});
   } catch (e) {
     res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/lists');</script>");
     return;
