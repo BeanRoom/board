@@ -21,12 +21,12 @@ MongoClient.connect(url, function(err,client) {
 /* GET home page. */
 router.get('/:board', function(req, res, next) {
   var board = req.params.board;
-  if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
-    board = "freeboard";
-  }
   if (board === "error") {
     res.render('board/error');
     return;
+  }
+  if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
+    res.redirect("/board/freeboard");
   }
   console.log(board);
   dbo.collection('board').find({board: board}).toArray(function(err, result) {
@@ -54,21 +54,23 @@ router.get('/:board/:id', function(req, res, next) {
   if (id === "write") {
     res.render('board/write', { board: board });
   } else {
-    var dbData;
+    id *= 1;
     try {
-      dbData = dbo.collection('board').findOne({visible: 1, board: board, board_num: id});
+      list = dbo.collection('board').findOne({board_num: id}, function(err, result) {
+        console.log(result);
+        if (err) throw err;
+        //var postWriter = result.writerID;
+        //if (result.visible == 0) {
+        //  postWriter = "익명";
+        //}
+        console.log("Board System Working");
+        res.render('board/view', { data: result, writer: postWriter, boardNum: req.params.id });
+      });
     } catch (e) {
+      console.log(e);
       res.redirect('/board/error');
       return;
     }
-
-
-    var postWriter = dbData['writer']
-    if (dbData['visible'] == 0) {
-      postWriter = "익명";
-    }
-    console.log("Board System Working");
-    res.render('board/view', { title: dbData['title'], content: dbData['content'], time: dbData['time'], hits: dbData['hits'], writer: postWriter, boardNum: req.params.id });
   }
 });
 
