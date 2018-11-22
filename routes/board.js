@@ -7,25 +7,16 @@ var mongoose = require('mongoose');
 var router = express.Router();
 // DB 대체
 //var dbData = require('../public/test/db.json');
-
-(async function() {
-  // Connection URL
-  const url = 'mongodb://localhost:27017/board';
-  // Database Name
-  const dbName = 'board';
-  const client = new MongoClient(url);
-
-  try {
-    // Use connect method to connect to the Server
-    await client.connect();
-
-    const db = client.db(dbName);
-  } catch (err) {
-    console.log(err.stack);
-  }
-
-  //client.close();
-})();
+// Connection URL
+const url = 'mongodb://127.0.0.1:27017';
+// Database Name
+var dbo;
+const dbName = 'board';
+MongoClient.connect(url, function(err,client) {
+  assert.equal(null,err);
+  console.log("연결 성공");
+  dbo = client.db('test');
+})
 
 /* GET home page. */
 router.get('/:board', function(req, res, next) {
@@ -37,13 +28,16 @@ router.get('/:board', function(req, res, next) {
     res.render('board/error');
     return;
   }
-  var dbData = db.collection('board').find({board: board});
-  for (var i = 0; i < dbdata.length; i++) {
-    if (dbdata[i]['visible'] === 0) {
-      dbdata[i]['writer_id'] = "익명";
+  console.log(board);
+  dbo.collection('board').find({board: board}).toArray(function(err, result) {
+    for (var i = 0; i < result.length; i++) {
+      if (result[i].visible === 0) {
+        result[i].writerID = "익명";
+      }
     }
-  }
-  res.render('board/lists', { board: board, list: dbData });
+    console.log(result);
+    res.render('board/lists', { board: board, list: result });
+  });
 });
 
 router.get('/:board/:id', function(req, res, next) {
@@ -62,7 +56,7 @@ router.get('/:board/:id', function(req, res, next) {
   } else {
     var dbData;
     try {
-      dbData = db.collection('board').findOne({visible: 1, board: board, board_num: id});
+      dbData = dbo.collection('board').findOne({visible: 1, board: board, board_num: id});
     } catch (e) {
       res.redirect('/board/error');
       return;
@@ -88,13 +82,9 @@ router.get('/:board/:id/:mode', function(req,res,next) {
     res.redirect("/board/freeboard");
     return;
   }
-  if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
-    res.redirect("/board/freeboard");
-    return;
-  }
   var dbData;
   try {
-    dbData = db.board.findOne({visible: 1, board: board, board_num: id});
+    dbData = dbo.board.findOne({visible: 1, board: board, board_num: id});
   } catch (e) {
     res.redirect('/board/error');
     return;
@@ -115,7 +105,7 @@ router.get('/deleteDo/:id', function(req, res, next) {
     res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/lists');</script>");
     return;
   }
-  db.board.remove({"board_num": req.params.id})
+  dbo.board.remove({"board_num": req.params.id})
   // DB 처리
   res.redirect("/board/lists");
 })
@@ -126,11 +116,11 @@ router.post('/writeDo/:id', function(req, res, next) {
   }
   var dbData;
   try {
-    db.collection('meta').findOne({info: 'board'}).toArray(function(err, result) {
+    dbo.collection('meta').findOne({info: 'board'}).toArray(function(err, result) {
       dbData = result['count'] + 1;
     });
-    db.meta.update({info:'board'}, {$set: { count: dbData }});
-    db.board.insertOne({board: req.body.board, board_num: dbData});
+    dbo.meta.update({info:'board'}, {$set: { count: dbData }});
+    dbo.board.insertOne({board: req.body.board, board_num: dbData,});
   } catch (e) {
     res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/lists');</script>");
     return;

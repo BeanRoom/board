@@ -5,17 +5,15 @@
     <title>List</title>
   </head>
   <body>
-    <% if (typeof flagDelete !== "undefined") { %>
+    <% if ((typeof flagDelete) !== "undefined") { %>
       <script type="text/javascript">
         alert("삭제 완료")
       </script>
     <% } %>
     <ul>
-      <li><%= list['title'] list['content'] list['hits'] list['writer']</li>
-    </ul>
-    <%=
-    <% for (var i in dbdata) { %>
-      abc
+    <% for (var i in list) { %>
+      <li><%= list[i].title %> <%= list[i].contents %> <%= list[i].hits %> <%= list[i].writerID %></li>
     <% } %>
+    </ul>
   </body>
 </html>
