@@ -18,6 +18,43 @@ MongoClient.connect(url, function(err,client) {
   dbo = client.db('test');
 })
 
+/* Functional */
+router.get('/deleteDo/:id', function(req, res, next) {
+  if (typeof req.params.id === "undefined") {
+    res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/lists');</script>");
+    return;
+  }
+  dbo.board.remove({"board_num": req.params.id})
+  // DB 처리
+  res.redirect("/board/"+board);
+})
+
+router.post('/:board/writeDo', function(req, res, next) {
+  var counts;
+  try {
+    dbo.collection('meta').findOne({info: 'board'}, function(err, result) {
+      counts = result.counter + 1;
+      console.log(counts);
+    });
+    dbo.collection('meta').updateOne({info:'board'}, {$set: { counter: counts }});
+    console.log(counts);
+    var sdfsdfsdf = counts;
+    dbo.collection('board').insertOne({board: req.params.board,
+       boardNum: sdfsdfsdf,
+       title: req.body.title,
+       contents: req.body.text,
+       postingTime: '1960-01-01 06:00:00',
+       visable: 1,
+       writerID: 'startergate',
+    hits: 0});
+  } catch (e) {
+    res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/freeboard');</script>");
+    console.log(e);
+    return;
+  }
+  res.redirect("/board/"+req.params.board);
+})
+
 /* GET home page. */
 router.get('/:board', function(req, res, next) {
   var board = req.params.board;
@@ -64,7 +101,7 @@ router.get('/:board/:id', function(req, res, next) {
         //  postWriter = "익명";
         //}
         console.log("Board System Working");
-        res.render('board/view', { data: result, writer: postWriter, boardNum: req.params.id });
+        res.render('board/view', { data: result, boardNum: req.params.id });
       });
     } catch (e) {
       console.log(e);
@@ -102,32 +139,6 @@ router.get('/:board/:id/:mode', function(req,res,next) {
   }
 });
 
-router.get('/deleteDo/:id', function(req, res, next) {
-  if (typeof req.params.id === "undefined") {
-    res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/lists');</script>");
-    return;
-  }
-  dbo.board.remove({"board_num": req.params.id})
-  // DB 처리
-  res.redirect("/board/lists");
-})
 
-router.post('/writeDo/:id', function(req, res, next) {
-  if (typeof req.params.id === "undefined") {
-    res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/lists');</script>");
-  }
-  var dbData;
-  try {
-    dbo.collection('meta').findOne({info: 'board'}).toArray(function(err, result) {
-      dbData = result['count'] + 1;
-    });
-    dbo.meta.update({info:'board'}, {$set: { count: dbData }});
-    dbo.board.insertOne({board: req.body.board, board_num: dbData,});
-  } catch (e) {
-    res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/lists');</script>");
-    return;
-  }
-  res.redirect("/board/lists");
-})
 
 module.exports = router;

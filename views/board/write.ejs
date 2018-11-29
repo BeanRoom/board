@@ -5,9 +5,10 @@
     <title>작성하기 - <%= board %></title>
   </head>
   <body>
-    <form class="" action="/board/writeDo" method="post">
-      <input type="text" name="" value="">
-      <textarea name="name" rows="8" cols="80"></textarea>
+    <form class="" action="/board/<%= board%>/writeDo" method="post">
+      <input type="text" name="title" value="">
+      <textarea name="text" rows="8" cols="80"></textarea>
+      <input type="submit" >
     </form>
   </body>
 </html>
