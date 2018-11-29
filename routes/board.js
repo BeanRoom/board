@@ -18,6 +18,10 @@ MongoClient.connect(url, function(err,client) {
   dbo = client.db('test');
 })
 
+router.get('/', function(req, res, next) {
+  res.redirect("/board/freeboard");
+});
+
 /* Functional */
 router.get('/deleteDo/:id', function(req, res, next) {
   if (typeof req.params.id === "undefined") {
@@ -30,30 +34,27 @@ router.get('/deleteDo/:id', function(req, res, next) {
 })
 
 router.post('/:board/writeDo', function(req, res, next) {
-  var counts;
   try {
     dbo.collection('meta').findOne({info: 'board'}, function(err, result) {
-      counts = result.counter + 1;
+      var counts = result.counter + 1;
+      dbo.collection('meta').updateOne({info:'board'}, {$set: { counter: counts }});
       console.log(counts);
+      dbo.collection('board').insertOne({board: req.params.board,
+         boardNum: counts,
+         title: req.body.title,
+         contents: req.body.text,
+         postingTime: '1960-01-01 06:00:00',
+         visable: 1,
+         writerID: 'startergate',
+      hits: 0});
     });
-    dbo.collection('meta').updateOne({info:'board'}, {$set: { counter: counts }});
-    console.log(counts);
-    var sdfsdfsdf = counts;
-    dbo.collection('board').insertOne({board: req.params.board,
-       boardNum: sdfsdfsdf,
-       title: req.body.title,
-       contents: req.body.text,
-       postingTime: '1960-01-01 06:00:00',
-       visable: 1,
-       writerID: 'startergate',
-    hits: 0});
   } catch (e) {
     res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/freeboard');</script>");
     console.log(e);
     return;
   }
   res.redirect("/board/"+req.params.board);
-})
+});
 
 /* GET home page. */
 router.get('/:board', function(req, res, next) {
@@ -65,14 +66,12 @@ router.get('/:board', function(req, res, next) {
   if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
     res.redirect("/board/freeboard");
   }
-  console.log(board);
   dbo.collection('board').find({board: board}).toArray(function(err, result) {
     for (var i = 0; i < result.length; i++) {
       if (result[i].visible === 0) {
         result[i].writerID = "익명";
       }
     }
-    console.log(result);
     res.render('board/lists', { board: board, list: result });
   });
 });
