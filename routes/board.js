@@ -34,7 +34,7 @@ router.post('/:board/writeDo', function(req, res, next) {
          boardNum: counts,
          title: req.body.title,
          contents: req.body.text,
-         postingTime: (new Date().valueOf() / 1000),
+         postingTime: new Date().valueOf(),
          visable: 1,
          writerID: 'startergate',
       hits: 0});
@@ -84,6 +84,8 @@ router.get('/:board/:id', function(req, res, next) {
     try {
       list = dbo.collection('board').findOne({boardNum: Number(id)}, function(err, result) {
         if (err) throw err;
+        var counts = result.hits + 1;
+        dbo.collection('board').updateOne({boardNum: Number(id)}, {$set: { hits: counts }});
         var postWriter = result["writerID"];
         if (result.visible == 0) {
           postWriter = "익명";
@@ -97,6 +99,21 @@ router.get('/:board/:id', function(req, res, next) {
       return;
     }
   }
+});
+
+router.post('/:board/:id/editDo', function(req,res,next) {
+  var board = req.params.board;
+  if (typeof req.params.board === "undefined" || (board !== 'freeboard' && board !== 'notice' && board !== 'storage')) {
+    res.redirect("/board/freeboard");
+    return;
+  }
+  if (typeof req.params.id === "undefined") {
+    res.redirect("/board/freeboard");
+    return;
+  }
+  dbo.collection("board").updateOne({boardNum: Number(req.params.id)}, {$set: { title: req.body.title, contents: req.body.text }})
+  // DB 처리
+  res.redirect("/board/"+board+"/"+req.params.id);
 });
 
 router.get('/:board/:id/:mode', function(req,res,next) {
@@ -135,6 +152,7 @@ router.get('/:board/:id/:mode', function(req,res,next) {
     return;
   }
 });
+
 
 
 
