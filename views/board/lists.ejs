@@ -9,6 +9,7 @@
     <% for (var i in list) { %>
       <li><a href="/board/<%= board %>/<%= list[i].boardNum %>"><%= list[i].title %> <%= list[i].contents %> <%= list[i].hits %> <%= list[i].writerID %></a></li>
     <% } %>
+      <li><a href="/board/<%= board %>/write">NEW!</a></li>
     </ul>
   </body>
 </html>
