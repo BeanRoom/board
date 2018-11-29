@@ -23,15 +23,6 @@ router.get('/', function(req, res, next) {
 });
 
 /* Functional */
-router.get('/deleteDo/:id', function(req, res, next) {
-  if (typeof req.params.id === "undefined") {
-    res.send("<script type='text/javascript'>window.alert('ERROR.');window.location=('/board/lists');</script>");
-    return;
-  }
-  dbo.board.remove({"board_num": req.params.id})
-  // DB 처리
-  res.redirect("/board/"+board);
-})
 
 router.post('/:board/writeDo', function(req, res, next) {
   try {
@@ -118,14 +109,22 @@ router.get('/:board/:id/:mode', function(req,res,next) {
     res.redirect("/board/freeboard");
     return;
   }
+  if (req.params.mode === "deleteDo") {
+    dbo.collection("board").deleteOne({"boardNum": Number(req.params.id)}, function(err, obj) {
+      console.log(err);
+    })
+    // DB 처리
+    res.redirect("/board/"+board);
+  }
   try {
-    dbo.collection("board").findOne({visible: 1, board: board, boardNum: req.params.id}, function(err, result) {
+    dbo.collection("board").findOne({boardNum: Number(req.params.id)}, function(err, result) {
+      console.log(req.params.id);
       switch (req.params.mode) {
         case "edit":
           res.render('board/edit', { board: board, data: result });
           break;
         case "delete":
-          res.render('board/delete', { title: dbData['title'], nid: req.params.id });
+          res.render('board/delete', { board: board, title: result['title'], nid: req.params.id });
         default:
           break;
       }

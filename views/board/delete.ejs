@@ -5,9 +5,9 @@
     <title></title>
   </head>
   <body>
-    <form action="board/deleteDo/?id=<%= nid %>" method="post">
+    <form action="/board/<%= board %>/<%= nid %>/deleteDo" method="get">
       <h1><%= title %></h1>
-      <input type="button" name="ddd" value="삭제!">
+      <input type="submit" value="삭제!">
     </form>
   </body>
 </html>

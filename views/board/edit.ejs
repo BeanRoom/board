@@ -5,9 +5,10 @@
     <title>edit</title>
   </head>
   <body>
-    <form class="" action="/board/editDo" method="post">
-      <input type="text" name="" value="<%= data['title'] %>">
-      <textarea name="name" rows="8" cols="80"><%= data['content'] %></textarea>
+    <form class="" action="/board/<%= board %>/<%= data['boardNum'] %>/editDo" method="post">
+      <input type="text" name="title" value="<%= data['title'] %>">
+      <textarea name="text" rows="8" cols="80"><%= data['contents'] %></textarea>
+      <input type="submit" >
     </form>
   </body>
 </html>
