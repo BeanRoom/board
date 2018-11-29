@@ -5,6 +5,7 @@
     <title><%= data['title'] %></title>
   </head>
   <body>
+    <a href="./">글 목록으로</a>
     <h1 class="title">제목: <%= data['title'] %></h1>
     <p class="edittime">작성 시간: <script>
     var t = new Date(<%= data['postingTime'] %>).toString().split(" (")[0];
