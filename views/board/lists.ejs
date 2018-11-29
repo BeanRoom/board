@@ -5,14 +5,9 @@
     <title>List</title>
   </head>
   <body>
-    <% if ((typeof flagDelete) !== "undefined") { %>
-      <script type="text/javascript">
-        alert("삭제 완료")
-      </script>
-    <% } %>
     <ul>
     <% for (var i in list) { %>
-      <li><%= list[i].title %> <%= list[i].contents %> <%= list[i].hits %> <%= list[i].writerID %></li>
+      <li><a href="/board/<%= board %>/<%= list[i].boardNum %>"><%= list[i].title %> <%= list[i].contents %> <%= list[i].hits %> <%= list[i].writerID %></a></li>
     <% } %>
     </ul>
   </body>
