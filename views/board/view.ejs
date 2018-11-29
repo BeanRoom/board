@@ -2,13 +2,17 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title><%= data['title'] %></title>
   </head>
   <body>
-    <h1 class="title">제목: <%= title %></h1>
-    <p class="edittime">작성 시간: <%= time %></p>
-    <p class="hits">조회 수: <%= hits %></p>
-    <p class="writer">작성자: <%= writer %></p>
-    <div class="text">내용: <%= content %></div>
+    <h1 class="title">제목: <%= data['title'] %></h1>
+    <p class="edittime">작성 시간: <script>
+    var t = new Date(<%= data['postingTime'] %>).toString().split(" (")[0];
+      document.write(t);
+    </script></p>
+    <p class="hits">조회 수: <%= data['hits'] %></p>
+    <p class="writer">작성자: <%= data['writerID'] %></p>
+    <div class="text">내용: <%= data['contents'] %></div>
+    <a href="<%= boardNum %>/edit">수정하기</a>
   </body>
 </html>

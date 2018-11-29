@@ -43,7 +43,7 @@ router.post('/:board/writeDo', function(req, res, next) {
          boardNum: counts,
          title: req.body.title,
          contents: req.body.text,
-         postingTime: '1960-01-01 06:00:00',
+         postingTime: (new Date().valueOf() / 1000),
          visable: 1,
          writerID: 'startergate',
       hits: 0});
@@ -90,17 +90,15 @@ router.get('/:board/:id', function(req, res, next) {
   if (id === "write") {
     res.render('board/write', { board: board });
   } else {
-    id *= 1;
     try {
-      list = dbo.collection('board').findOne({board_num: id}, function(err, result) {
-        console.log(result);
+      list = dbo.collection('board').findOne({boardNum: Number(id)}, function(err, result) {
         if (err) throw err;
-        //var postWriter = result.writerID;
-        //if (result.visible == 0) {
-        //  postWriter = "익명";
-        //}
+        var postWriter = result["writerID"];
+        if (result.visible == 0) {
+          postWriter = "익명";
+        }
         console.log("Board System Working");
-        res.render('board/view', { data: result, boardNum: req.params.id });
+        res.render('board/view', { data: result, writer: postWriter, boardNum: req.params.id });
       });
     } catch (e) {
       console.log(e);
@@ -120,21 +118,22 @@ router.get('/:board/:id/:mode', function(req,res,next) {
     res.redirect("/board/freeboard");
     return;
   }
-  var dbData;
   try {
-    dbData = dbo.board.findOne({visible: 1, board: board, board_num: id});
+    dbo.collection("board").findOne({visible: 1, board: board, boardNum: req.params.id}, function(err, result) {
+      switch (req.params.mode) {
+        case "edit":
+          res.render('board/edit', { board: board, data: result });
+          break;
+        case "delete":
+          res.render('board/delete', { title: dbData['title'], nid: req.params.id });
+        default:
+          break;
+      }
+    });
   } catch (e) {
+    console.log(e);
     res.redirect('/board/error');
     return;
-  }
-  switch (req.params.mode) {
-    case "edit":
-      res.render('board/edit', { board: board, title: dbData['title'], content: dbData['content'] });
-      break;
-    case "delete":
-      res.render('board/delete', { title: dbData['title'], nid: req.params.id });
-    default:
-      break;
   }
 });
 
