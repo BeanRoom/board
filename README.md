@@ -23,3 +23,5 @@ hits: Integer
   writerID: "startergate",
   hits: 0
 }
+
+node_modules가 깃이그노어 늦게 적용해서 남아있으니 삭제하고 새로 
