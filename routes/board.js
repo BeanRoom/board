@@ -1,9 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 var express = require('express');
-var request = require('request');
 var bodyparser = require('body-parser');
-var mongoose = require('mongoose');
 var router = express.Router();
 // DB 대체
 //var dbData = require('../public/test/db.json');
